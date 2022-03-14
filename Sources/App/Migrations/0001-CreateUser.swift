@@ -7,6 +7,7 @@ extension User {
                 .id()
                 .field(v20220314.name, .string, .required)
                 .field(v20220314.email, .string, .required)
+                .field(v20220314.passwordHash, .string, .required)
                 .field(v20220314.siwaID, .string)
                 .create()
         }

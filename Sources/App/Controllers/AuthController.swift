@@ -21,7 +21,8 @@ struct AuthController: RouteCollection {
             guard let email = siwaToken.email, let name = data.name else {
                 throw Abort(.badRequest)
             }
-            user = User(name: name, email: email, siwaID: siwaToken.subject.value)
+            // Set the password t oa secure random value. This won't be run through BCrypt so can't be used to log in anyway
+            user = User(name: name, email: email, passwordHash: [UInt8].random(count: 32).base64, siwaID: siwaToken.subject.value)
             try await user.create(on: req.db)
         }
         let token = try user.generateToken()
