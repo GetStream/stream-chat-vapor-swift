@@ -8,7 +8,7 @@ struct AuthController: RouteCollection {
         authRoutes.post("register", use: registerHandler)
         authRoutes.post("siwa", use: signInWithAppleHandler)
         
-        let basicAuthRoutes = authRoutes.grouped(User.authenticator())
+        let basicAuthRoutes = authRoutes.grouped(User.authenticator(), User.guardMiddleware())
         basicAuthRoutes.post("login", use: loginHandler)
     }
     
