@@ -6,4 +6,5 @@ func routes(_ app: Application) throws {
         "OK"
     }
 
+    try app.register(collection: AuthController())
 }
