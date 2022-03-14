@@ -21,7 +21,7 @@ final class User: Model, Content {
 
     init() { }
     
-    init(id: UUID? = nil, name: String, email: String, passwordHash: String, siwaID: String) {
+    init(id: UUID? = nil, name: String, email: String, passwordHash: String, siwaID: String?) {
         self.id = id
         self.name = name
         self.email = email
@@ -30,7 +30,14 @@ final class User: Model, Content {
     }
 }
 
-extension User: Authenticatable {}
+extension User: ModelAuthenticatable {
+    static let passwordHashKey = \User.$passwordHash
+    static var usernameKey = \User.$email
+    
+    func verify(password: String) throws -> Bool {
+        try Bcrypt.verify(password, created: self.passwordHash)
+    }
+}
 
 extension User {
     func generateToken() throws -> UserToken {

@@ -4,8 +4,39 @@ import Fluent
 
 struct AuthController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        let authRouthes = routes.grouped("auth")
-        authRouthes.post("siwa", use: signInWithAppleHandler)
+        let authRoutes = routes.grouped("auth")
+        authRoutes.post("register", use: registerHandler)
+        authRoutes.post("siwa", use: signInWithAppleHandler)
+        
+        let basicAuthRoutes = authRoutes.grouped(User.authenticator())
+        basicAuthRoutes.post("login", use: loginHandler)
+    }
+    
+    func registerHandler(_ req: Request) async throws -> UserToken {
+        try CreateUserData.validate(content: req)
+        
+        let data = try req.content.decode(CreateUserData.self)
+        let user = User(name: data.name, email: data.email, passwordHash: data.password, siwaID: nil)
+        do {
+            try await user.create(on: req.db)
+        } catch {
+            if let error = error as? DatabaseError, error.isConstraintFailure {
+                throw Abort(.badRequest, reason: "A user with that email already exists")
+            } else {
+                throw error
+            }
+        }
+        let token = try user.generateToken()
+        try await token.create(on: req.db)
+        return token
+    }
+    
+    // Uses basic authentication to provide an actual bearer token
+    func loginHandler(_ req: Request) async throws -> UserToken {
+        let user = try req.auth.require(User.self)
+        let token = try user.generateToken()
+        try await token.create(on: req.db)
+        return token
     }
     
     func signInWithAppleHandler(_ req: Request) async throws -> UserToken {
@@ -28,5 +59,20 @@ struct AuthController: RouteCollection {
         let token = try user.generateToken()
         try await token.create(on: req.db)
         return token
+    }
+}
+
+import Vapor
+
+struct CreateUserData: Content, Validatable {
+    var name: String
+    var email: String
+    var password: String
+    
+    /// Ensures a valid email is entered as well as a password of a given length (8 currently)
+    static func validations(_ validations: inout Validations) {
+        validations.add("email", as: String.self, is: .email)
+        validations.add("password", as: String.self, is: .count(8...))
+        validations.add("name", as: String.self, is: .count(1...))
     }
 }
