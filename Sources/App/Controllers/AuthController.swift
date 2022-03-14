@@ -16,7 +16,8 @@ struct AuthController: RouteCollection {
         try CreateUserData.validate(content: req)
         
         let data = try req.content.decode(CreateUserData.self)
-        let user = User(name: data.name, email: data.email, passwordHash: data.password, siwaID: nil)
+        let passwordHash = try await req.password.async.hash(data.password)
+        let user = User(name: data.name, email: data.email, passwordHash: passwordHash, siwaID: nil)
         do {
             try await user.create(on: req.db)
         } catch {
