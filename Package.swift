@@ -6,6 +6,9 @@ let package = Package(
     platforms: [
        .macOS(.v12)
     ],
+    products: [
+        .library(name: "StreamSDKVapor", targets: ["StreamSDKVapor"]),
+    ],
     dependencies: [
         // 💧 A server-side Swift web framework.
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
@@ -21,6 +24,7 @@ let package = Package(
                 .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "JWT", package: "jwt"),
+                "StreamSDKVapor",
             ],
             swiftSettings: [
                 // Enable better optimizations when building in Release configuration. Despite the use of
@@ -33,6 +37,13 @@ let package = Package(
         .testTarget(name: "AppTests", dependencies: [
             .target(name: "App"),
             .product(name: "XCTVapor", package: "vapor"),
-        ])
+        ]),
+        .target(
+            name: "StreamSDKVapor",
+            dependencies: [
+                .product(name: "JWT", package: "jwt"),
+                .product(name: "Vapor", package: "vapor"),
+            ]
+        ),
     ]
 )

@@ -33,14 +33,15 @@ struct AuthController: RouteCollection {
     }
     
     // Uses basic authentication to provide an actual bearer token
-    func loginHandler(_ req: Request) async throws -> UserToken {
+    func loginHandler(_ req: Request) async throws -> LoginResponse {
         let user = try req.auth.require(User.self)
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        return token
+        let streamToken = try req.stream.createToken(name: user.email)
+        return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
     
-    func signInWithAppleHandler(_ req: Request) async throws -> UserToken {
+    func signInWithAppleHandler(_ req: Request) async throws -> LoginResponse {
         let data = try req.content.decode(SignInWithAppleToken.self)
         guard let appIdentifier = Environment.get("IOS_APPLICATION_IDENTIFIER") else {
             throw Abort(.internalServerError)
@@ -59,21 +60,7 @@ struct AuthController: RouteCollection {
         }
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        return token
-    }
-}
-
-import Vapor
-
-struct CreateUserData: Content, Validatable {
-    var name: String
-    var email: String
-    var password: String
-    
-    /// Ensures a valid email is entered as well as a password of a given length (8 currently)
-    static func validations(_ validations: inout Validations) {
-        validations.add("email", as: String.self, is: .email)
-        validations.add("password", as: String.self, is: .count(8...))
-        validations.add("name", as: String.self, is: .count(1...))
+        let streamToken = try req.stream.createToken(name: user.email)
+        return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
 }

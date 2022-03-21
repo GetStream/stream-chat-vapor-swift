@@ -1,6 +1,7 @@
 import Fluent
 import FluentPostgresDriver
 import Vapor
+import StreamSDKVapor
 
 // configures your application
 public func configure(_ app: Application) throws {
@@ -17,4 +18,12 @@ public func configure(_ app: Application) throws {
     
     // register routes
     try routes(app)
+    
+    guard let streamAccessKey = Environment.get("STREAM_ACCESS_KEY"), let streamAccessSecret = Environment.get("STREAM_ACCESS_SECRET") else {
+        app.logger.critical("STREAM keys not set")
+        fatalError("STREAM keys not set")
+    }
+    
+    let stream = Stream(accessKey: streamAccessKey, accessSecret: streamAccessSecret)
+    app.stream.use(stream)
 }
