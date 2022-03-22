@@ -12,7 +12,7 @@ struct AuthController: RouteCollection {
         basicAuthRoutes.post("login", use: loginHandler)
     }
     
-    func registerHandler(_ req: Request) async throws -> UserToken {
+    func registerHandler(_ req: Request) async throws -> LoginResponse {
         try CreateUserData.validate(content: req)
         
         let data = try req.content.decode(CreateUserData.self)
@@ -29,7 +29,8 @@ struct AuthController: RouteCollection {
         }
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        return token
+        let streamToken = try req.stream.createToken(name: user.email)
+        return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
     
     // Uses basic authentication to provide an actual bearer token
