@@ -9,6 +9,8 @@ extension User {
                 .field(v20220314.email, .string, .required)
                 .field(v20220314.passwordHash, .string, .required)
                 .field(v20220314.siwaID, .string)
+                .unique(on: v20220314.username)
+                .unique(on: v20220314.email)
                 .create()
         }
         

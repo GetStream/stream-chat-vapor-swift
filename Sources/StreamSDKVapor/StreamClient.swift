@@ -19,7 +19,7 @@ public struct StreamClient {
         self.eventLoop = eventLoop
     }
     
-    public func createToken(name: String, expiresAt: Date? = nil) throws -> StreamToken {
+    public func createToken(id: String, expiresAt: Date? = nil) throws -> StreamToken {
         let signer = JWTSigner.hs256(key: accessSecret)
         let expiration: ExpirationClaim?
         if let expiresAt = expiresAt {
@@ -29,13 +29,39 @@ public struct StreamClient {
         }
         let payload = StreamPayload(
             expiration: expiration,
-            userID: name
+            userID: id
         )
         let jwt = try signer.sign(payload)
         return StreamToken(jwt: jwt)
     }
+    
+    public func registerUser(id: String) async throws {
+        let url: URI = "https://chat-proxy-us-east.stream-io-api.com/guest?api_key=\(accessKey)"
+        var headers = HTTPHeaders()
+        headers.add(name: "stream-auth-type", value: "anonymous")
+        let response = try await client.post(url, headers: headers, beforeSend: { req in
+            let data = RegisterUserData(user: .init(id: id))
+            try req.content.encode(data)
+        })
+        guard response.status == .accepted else {
+            throw Abort(.badRequest)
+        }
+    }
+    
+    public func registerUserWithToken(id: String) async throws -> StreamToken {
+        try await registerUser(id: id)
+        return try createToken(id: id)
+    }
 }
 
+
+struct RegisterUserData: Content {
+    let user: RegisterUserDataUser
+}
+
+struct RegisterUserDataUser: Content {
+    let id: String
+}
 
 public struct StreamToken: Codable {
     public let jwt: String

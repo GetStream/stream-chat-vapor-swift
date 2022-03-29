@@ -17,7 +17,7 @@ struct AuthController: RouteCollection {
         
         let data = try req.content.decode(CreateUserData.self)
         let passwordHash = try await req.password.async.hash(data.password)
-        let user = User(name: data.name, email: data.email, passwordHash: passwordHash, siwaID: nil)
+        let user = User(name: data.name, email: data.email, username: data.username, passwordHash: passwordHash, siwaID: nil)
         do {
             try await user.create(on: req.db)
         } catch {
@@ -29,7 +29,7 @@ struct AuthController: RouteCollection {
         }
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        let streamToken = try req.stream.createToken(name: user.email)
+        let streamToken = try await req.stream.registerUserWithToken(id: user.username)
         return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
     
@@ -38,7 +38,7 @@ struct AuthController: RouteCollection {
         let user = try req.auth.require(User.self)
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        let streamToken = try req.stream.createToken(name: user.email)
+        let streamToken = try req.stream.createToken(id: user.email)
         return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
     
@@ -56,12 +56,14 @@ struct AuthController: RouteCollection {
                 throw Abort(.badRequest)
             }
             // Set the password t oa secure random value. This won't be run through BCrypt so can't be used to log in anyway
-            user = User(name: name, email: email, passwordHash: [UInt8].random(count: 32).base64, siwaID: siwaToken.subject.value)
+            // The username is restricted to certain characters in Stream's backend
+            let username = data.username ?? email.replacingOccurrences(of: "@", with: "-")
+            user = User(name: name, email: email, username: username, passwordHash: [UInt8].random(count: 32).base64, siwaID: siwaToken.subject.value)
             try await user.create(on: req.db)
         }
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        let streamToken = try req.stream.createToken(name: user.email)
+        let streamToken = try await req.stream.registerUserWithToken(id: user.username)
         return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
 }

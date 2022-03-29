@@ -7,6 +7,7 @@ extension User {
         static let name = FieldKey(stringLiteral: "name")
         static let siwaID = FieldKey(stringLiteral: "sign_in_with_apple_id")
         static let email = FieldKey(stringLiteral: "email")
+        static let username = FieldKey(stringLiteral: "username")
         static let passwordHash = FieldKey(stringLiteral: "password_hash")
     }
 }
