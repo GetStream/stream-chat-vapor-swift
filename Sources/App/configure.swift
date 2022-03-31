@@ -26,4 +26,6 @@ public func configure(_ app: Application) throws {
     
     let stream = Stream(accessKey: streamAccessKey, accessSecret: streamAccessSecret)
     app.stream.use(stream)
+    
+    app.middleware.use(app.sessions.middleware)
 }

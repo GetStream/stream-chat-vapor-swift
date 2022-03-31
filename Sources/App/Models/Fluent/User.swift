@@ -43,6 +43,8 @@ extension User: ModelAuthenticatable {
     }
 }
 
+extension User: ModelSessionAuthenticatable {}
+
 extension User {
     func generateToken() throws -> UserToken {
         try UserToken(

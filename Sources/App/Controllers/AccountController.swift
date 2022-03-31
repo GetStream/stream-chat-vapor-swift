@@ -1,4 +1,6 @@
 import Vapor
+import JWT
+import StreamSDKVapor
 
 struct AccountController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
