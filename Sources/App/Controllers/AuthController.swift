@@ -37,7 +37,7 @@ struct AuthController: RouteCollection {
         }
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        let streamToken = try await req.stream.registerUserWithToken(id: user.username)
+        let streamToken = try req.stream.createToken(id: user.username)
         return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
     
@@ -71,7 +71,7 @@ struct AuthController: RouteCollection {
         }
         let token = try user.generateToken()
         try await token.create(on: req.db)
-        let streamToken = try await req.stream.registerUserWithToken(id: user.username)
+        let streamToken = try req.stream.createToken(id: user.username)
         return LoginResponse(apiToken: token, streamToken: streamToken.jwt)
     }
     
