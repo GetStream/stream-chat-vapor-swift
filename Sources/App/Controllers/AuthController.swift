@@ -12,12 +12,10 @@ struct AuthController: RouteCollection {
         let basicAuthRoutes = authRoutes.grouped(User.authenticator(), User.guardMiddleware())
         basicAuthRoutes.post("login", use: loginHandler)
         
-        guard let googleCallbackURL = Environment.get("GOOGLE_CALLBACK_URL") else {
-            fatalError("Google callback URL not set")
+        if let googleCallbackURL = Environment.get("GOOGLE_CALLBACK_URL") {
+            try routes.oAuth(from: Google.self, authenticate: "login-google", callback: googleCallbackURL, scope: ["profile", "email"], completion: processGoogleLogin)
+            routes.get("iOS", "login-google", use: iOSGoogleLogin)
         }
-        try routes.oAuth(from: Google.self, authenticate: "login-google", callback: googleCallbackURL, scope: ["profile", "email"], completion: processGoogleLogin)
-        
-        routes.get("iOS", "login-google", use: iOSGoogleLogin)
     }
     
     func registerHandler(_ req: Request) async throws -> LoginResponse {
@@ -106,7 +104,11 @@ struct AuthController: RouteCollection {
         if req.session.data["oauth_login"] == "iOS" {
             let token = try user.generateToken()
             try await token.save(on: req.db)
-            redirectURL = "tilapp://auth?token=\(token.value)"
+            guard let appURL = Environment.get("APP_REDIRECT_URL") else {
+                req.logger.warning("APP_REDIRECT_URL not set")
+                throw Abort(.internalServerError)
+            }
+            redirectURL = "\(appURL)://auth?token=\(token.value)"
         } else {
             redirectURL = "/"
         }
