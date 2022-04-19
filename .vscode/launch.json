@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug Run",
+            "program": "${workspaceFolder:StreamChat}/.build/debug/Run",
+            "args": [],
+            "cwd": "${workspaceFolder:StreamChat}",
+            "preLaunchTask": "swift: Build Debug Run"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Release Run",
+            "program": "${workspaceFolder:StreamChat}/.build/release/Run",
+            "args": [],
+            "cwd": "${workspaceFolder:StreamChat}",
+            "preLaunchTask": "swift: Build Release Run"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug ExampleApp",
+            "program": "${workspaceFolder:StreamChat}/.build/debug/ExampleApp",
+            "args": [],
+            "cwd": "${workspaceFolder:StreamChat}",
+            "preLaunchTask": "swift: Build Debug ExampleApp"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Release ExampleApp",
+            "program": "${workspaceFolder:StreamChat}/.build/release/ExampleApp",
+            "args": [],
+            "cwd": "${workspaceFolder:StreamChat}",
+            "preLaunchTask": "swift: Build Release ExampleApp"
+        }
+    ]
+}

@@ -1,7 +1,7 @@
-@testable import App
+@testable import ExampleApp
 import XCTVapor
 
-final class AppTests: XCTestCase {
+final class ExampleAppTests: XCTestCase {
     func testHelloWorld() throws {
         let app = Application(.testing)
         defer { app.shutdown() }

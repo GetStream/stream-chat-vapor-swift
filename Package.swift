@@ -18,8 +18,8 @@ let package = Package(
         .package(url: "https://github.com/vapor-community/Imperial.git", from: "1.0.0"),
     ],
     targets: [
-        .target(
-            name: "App",
+        .executableTarget(
+            name: "ExampleApp",
             dependencies: [
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
@@ -35,9 +35,8 @@ let package = Package(
                 .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release))
             ]
         ),
-        .executableTarget(name: "Run", dependencies: [.target(name: "App")]),
-        .testTarget(name: "AppTests", dependencies: [
-            .target(name: "App"),
+        .testTarget(name: "ExampleAppTests", dependencies: [
+            .target(name: "ExampleApp"),
             .product(name: "XCTVapor", package: "vapor"),
         ]),
         .target(
