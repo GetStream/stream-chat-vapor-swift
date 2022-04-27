@@ -2,6 +2,8 @@ import Foundation
 import JWTKit
 import Vapor
 
+
+/// A client for interacting with Stream and their services
 public struct StreamClient {
     let accessKey: String
     let accessSecret: String
@@ -12,13 +14,20 @@ public struct StreamClient {
         StreamClient(accessKey: self.accessKey, accessSecret: self.accessSecret, client: client, eventLoop: eventLoop)
     }
     
-    public init(accessKey: String, accessSecret: String, client: Client, eventLoop: EventLoop) {
+    
+    init(accessKey: String, accessSecret: String, client: Client, eventLoop: EventLoop) {
         self.accessKey = accessKey
         self.accessSecret = accessSecret
         self.client = client
         self.eventLoop = eventLoop
     }
     
+    
+    /// Create a JWT to use with client SDKs to interact with Stream
+    /// - Parameters:
+    ///   - id: The ID of the user for the token
+    ///   - expiresAt: An optional date the token should expire at. Defaults to no expiry date
+    /// - Returns: A `StreamToken` containing the JWT to provide to client SDKs
     public func createToken(id: String, expiresAt: Date? = nil) throws -> StreamToken {
         let signer = JWTSigner.hs256(key: accessSecret)
         let expiration: ExpirationClaim?
@@ -33,30 +42,5 @@ public struct StreamClient {
         )
         let jwt = try signer.sign(payload)
         return StreamToken(jwt: jwt)
-    }
-}
-
-public struct StreamToken: Codable {
-    public let jwt: String
-}
-
-public struct StreamPayload: JWTPayload {
-    enum CodingKeys: String, CodingKey {
-        case expiration = "exp"
-        case userID = "user_id"
-    }
-
-    // The "exp" (expiration time) claim identifies the expiration time on
-    // or after which the JWT MUST NOT be accepted for processing.
-    var expiration: ExpirationClaim?
-
-    // Custom data.
-    // If true, the user is an admin.
-    var userID: String
-    
-    public func verify(using signer: JWTSigner) throws {
-        if let expiration = self.expiration {
-            return try expiration.verifyNotExpired()
-        }
     }
 }

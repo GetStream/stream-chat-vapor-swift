@@ -24,8 +24,8 @@ public func configure(_ app: Application) throws {
         fatalError("STREAM keys not set")
     }
     
-    let stream = Stream(accessKey: streamAccessKey, accessSecret: streamAccessSecret)
-    app.stream.use(stream)
+    let streamConfig = StreamConfiguration(accessKey: streamAccessKey, accessSecret: streamAccessSecret)
+    app.stream.use(streamConfig)
     
     app.middleware.use(app.sessions.middleware)
 }
