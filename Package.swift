@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "StreamChat",
+    name: "StreamChatVapor",
     platforms: [
        .macOS(.v12)
     ],
