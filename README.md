@@ -5,6 +5,8 @@
 
 This library contains the code to integrate client applications with Stream's backend using [Vapor Swift](https://vapor.codes). It also contains an example application demonstrating how to integrate the library with a Vapor applications.
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FGetStream%2Fstream-chat-vapor-swift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/GetStream/stream-chat-vapor-swift) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FGetStream%2Fstream-chat-vapor-swift%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/GetStream/stream-chat-vapor-swift)
+
 ## Integrating the libray
 
 Add the library as a dependency to your `Package.swift`:
