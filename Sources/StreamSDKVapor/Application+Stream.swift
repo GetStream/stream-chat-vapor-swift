@@ -40,6 +40,7 @@ extension Application {
             }
         }
 
+        /// The central Vapor Application
         let application: Application
         
         var storage: Storage {

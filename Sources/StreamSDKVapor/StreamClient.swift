@@ -10,11 +10,21 @@ public struct StreamClient {
     let client: Client
     let eventLoop: EventLoop
     
+    /// Initializes a new `StreamClient` 'for' the given `EventLoop` and `Client`.
+    /// - Parameters:
+    ///   - eventLoop: <#eventLoop description#>
+    ///   - client: A Vapor `Client` object.
+    /// - Returns: An initialized StreamClient capable of connecting to the Stream backend to handle all Stream related network calls.
     func `for`(eventLoop: EventLoop, client: Client) -> StreamClient {
         StreamClient(accessKey: self.accessKey, accessSecret: self.accessSecret, client: client, eventLoop: eventLoop)
     }
     
     
+    /// Description
+    /// - Parameters:
+    ///   - accessKey: Access key to be obtained from the Stream dashboard
+    ///   - accessSecret: Access secret to be obtained from the Stream dashboard
+    ///   - client: A Vapor `Client` object.
     init(accessKey: String, accessSecret: String, client: Client, eventLoop: EventLoop) {
         self.accessKey = accessKey
         self.accessSecret = accessSecret
